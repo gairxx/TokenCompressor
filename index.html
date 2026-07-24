@@ -70,6 +70,8 @@
             max-width: 1200px;
             display: flex;
             justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
             margin-bottom: 2rem;
             animation: fadeInDown 0.8s ease-out 0.2s both;
         }
@@ -302,6 +304,54 @@
         </div>
     </div>
 
+    <div style="width: 100%; max-width: 1200px; margin-bottom: 2rem; animation: fadeInDown 0.8s ease-out 0.4s both;">
+        <div style="background: var(--panel-bg); backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+            <h3 style="color: #f0abfc; margin-bottom: 1rem; text-align: center;">💰 Estimated Money Saved Globally</h3>
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.95rem;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--glass-border);">
+                        <th style="text-align: left; padding: 0.6rem 1rem; color: var(--text-muted);">Model</th>
+                        <th style="text-align: right; padding: 0.6rem 1rem; color: var(--text-muted);">Price / 1M Tokens</th>
+                        <th style="text-align: right; padding: 0.6rem 1rem; color: var(--text-muted);">Saved So Far</th>
+                        <th style="text-align: right; padding: 0.6rem 1rem; color: var(--text-muted);">Projected / 1M Docs</th>
+                    </tr>
+                </thead>
+                <tbody id="savingsTableBody">
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 0.6rem 1rem; color: var(--text-main);">GPT-4</td>
+                        <td style="padding: 0.6rem 1rem; color: var(--text-muted); text-align: right;">$30.00</td>
+                        <td style="padding: 0.6rem 1rem; color: #10b981; text-align: right; font-weight: 600;" class="saved-gpt4">$0.00</td>
+                        <td style="padding: 0.6rem 1rem; color: #f0abfc; text-align: right;">$186,000</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 0.6rem 1rem; color: var(--text-main);">Claude Opus</td>
+                        <td style="padding: 0.6rem 1rem; color: var(--text-muted); text-align: right;">$15.00</td>
+                        <td style="padding: 0.6rem 1rem; color: #10b981; text-align: right; font-weight: 600;" class="saved-opus">$0.00</td>
+                        <td style="padding: 0.6rem 1rem; color: #f0abfc; text-align: right;">$93,000</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 0.6rem 1rem; color: var(--text-main);">GPT-4o</td>
+                        <td style="padding: 0.6rem 1rem; color: var(--text-muted); text-align: right;">$2.50</td>
+                        <td style="padding: 0.6rem 1rem; color: #10b981; text-align: right; font-weight: 600;" class="saved-gpt4o">$0.00</td>
+                        <td style="padding: 0.6rem 1rem; color: #f0abfc; text-align: right;">$15,500</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <td style="padding: 0.6rem 1rem; color: var(--text-main);">Gemini 2.5 Pro</td>
+                        <td style="padding: 0.6rem 1rem; color: var(--text-muted); text-align: right;">$1.25</td>
+                        <td style="padding: 0.6rem 1rem; color: #10b981; text-align: right; font-weight: 600;" class="saved-gemini">$0.00</td>
+                        <td style="padding: 0.6rem 1rem; color: #f0abfc; text-align: right;">$7,750</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.6rem 1rem; color: var(--text-main);">Claude Sonnet</td>
+                        <td style="padding: 0.6rem 1rem; color: var(--text-muted); text-align: right;">$3.00</td>
+                        <td style="padding: 0.6rem 1rem; color: #10b981; text-align: right; font-weight: 600;" class="saved-sonnet">$0.00</td>
+                        <td style="padding: 0.6rem 1rem; color: #f0abfc; text-align: right;">$18,600</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <div class="container">
         <div class="panel">
             <div class="panel-header">
@@ -363,8 +413,12 @@
 
         <div class="mcp-instructions" style="background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3);">
             <h3 style="color: #c084fc;">⚡ One-Click Auto-Install</h3>
-            <p>Copy the prompt below and paste it into <strong>any</strong> AI assistant (Claude, ChatGPT, Cursor, Windsurf, Antigravity, etc.). It will automatically create the MCP server file, install dependencies, and configure itself to use TokenCompressor.</p>
-            <div class="code-block" id="autoInstallPrompt" style="position: relative; cursor: pointer; border: 1px solid rgba(168, 85, 247, 0.3);">Create a file called `token_compressor_mcp.py` with the following content and save it to my home directory:
+            <p>Copy the prompt below and paste it into <strong>any</strong> AI assistant (Claude, ChatGPT, Cursor, Windsurf, Antigravity, etc.). It will automatically create the MCP server file, install dependencies, and configure itself to use TokenCompressor. <strong>Works with Python 3.10+ (MCP mode) and Python 3.6+ (API-only fallback).</strong></p>
+            <div class="code-block" id="autoInstallPrompt" style="position: relative; cursor: pointer; border: 1px solid rgba(168, 85, 247, 0.3);">I need you to set up the TokenCompressor MCP tool. Follow these steps:
+
+1. First, check my Python version by running `python --version`.
+
+2A. If Python >= 3.10, create a file called `token_compressor_mcp.py` in my home directory with:
 
 ```python
 from mcp.server.fastmcp import FastMCP
@@ -374,7 +428,7 @@ mcp = FastMCP("PromptCompressor")
 
 @mcp.tool()
 def compress_prompt(text: str) -> str:
-    """Compresses text to save LLM tokens via lexical optimization. Text is never stored. Only token savings are tracked globally."""
+    """Compresses text to save LLM tokens via lexical optimization. Text is never stored."""
     try:
         r = requests.post("https://tokencompressor.onrender.com/compress", json={"text": text})
         r.raise_for_status()
@@ -386,14 +440,28 @@ if __name__ == "__main__":
     mcp.run()
 ```
 
-Then run `pip install mcp requests` to install the dependencies.
+Then run `pip install mcp requests`.
 
-After that, register this as an MCP server:
-- If I'm in Cursor: add it to MCP settings with command `python ~/token_compressor_mcp.py`
-- If I'm Claude Desktop: add it to `claude_desktop_config.json` under mcpServers with command "python" and args ["~/token_compressor_mcp.py"]
+Register it as an MCP server:
+- Cursor: add to MCP settings, type stdio, command: `python ~/token_compressor_mcp.py`
+- Claude Desktop: add to `claude_desktop_config.json` under mcpServers with command "python" and args ["~/token_compressor_mcp.py"]
 - Otherwise: tell me how to register it for my current environment.
 
-Finally, confirm the setup is complete and test it by compressing this sentence: "Due to the fact that in order to achieve the purpose of testing, it is necessary to verify that the system has the ability to compress text."</div>
+2B. If Python < 3.10, skip the MCP server. Instead, add a global agent rule or system instruction that says:
+"When processing large text blocks, first compress them by POSTing to https://tokencompressor.onrender.com/compress with JSON body {"text": "..."} and use the compressed_text from the response."
+
+Also create a helper script called `compress.py` in my home directory with:
+
+```python
+import requests, sys
+text = open(sys.argv[1], 'r').read() if len(sys.argv) > 1 else sys.stdin.read()
+r = requests.post("https://tokencompressor.onrender.com/compress", json={"text": text})
+d = r.json()
+print(d["compressed_text"])
+print(f"\n--- Tokens saved: {d['tokens_saved']} | Global total: {d['global_tokens_saved']} ---", file=sys.stderr)
+```
+
+3. Confirm the setup is complete and test it by compressing: "Due to the fact that in order to achieve the purpose of testing, it is necessary to verify that the system has the ability to compress text."</div>
             <button class="secondary" id="copyInstallBtn" style="margin-top: 10px; border-color: rgba(168, 85, 247, 0.4);">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 Copy Auto-Install Prompt
@@ -433,12 +501,29 @@ Finally, confirm the setup is complete and test it by compressing this sentence:
 
         inputText.addEventListener('input', updateInputStats);
 
+        function updateSavingsTable(globalTokens) {
+            const prices = [
+                { cls: 'saved-gpt4', rate: 30 },
+                { cls: 'saved-opus', rate: 15 },
+                { cls: 'saved-gpt4o', rate: 2.5 },
+                { cls: 'saved-gemini', rate: 1.25 },
+                { cls: 'saved-sonnet', rate: 3 }
+            ];
+            prices.forEach(p => {
+                const dollars = (globalTokens / 1000000) * p.rate;
+                const el = document.querySelector('.' + p.cls);
+                if (el) el.textContent = '$' + dollars.toFixed(4);
+            });
+        }
+
         // Fetch initial global stats
         async function loadGlobalStats() {
             try {
                 const res = await fetch('/stats');
                 const data = await res.json();
-                globalTokenCounter.textContent = data.global_tokens_saved.toLocaleString();
+                const g = data.global_tokens_saved;
+                globalTokenCounter.textContent = g.toLocaleString();
+                updateSavingsTable(g);
             } catch (e) {
                 console.error("Could not load global stats", e);
             }
@@ -479,6 +564,7 @@ Finally, confirm the setup is complete and test it by compressing this sentence:
                 
                 globalTokenCounter.textContent = data.global_tokens_saved.toLocaleString();
                 globalTokenCounter.style.transform = 'scale(1.1)';
+                updateSavingsTable(data.global_tokens_saved);
                 
                 setTimeout(() => {
                     bigTokenCounter.style.transform = 'scale(1)';
