@@ -360,6 +360,45 @@
                 <li>Command: <code>python /path/to/TokenCompressor/mcp-server/server.py</code></li>
             </ol>
         </div>
+
+        <div class="mcp-instructions" style="background: rgba(168, 85, 247, 0.1); border-color: rgba(168, 85, 247, 0.3);">
+            <h3 style="color: #c084fc;">⚡ One-Click Auto-Install</h3>
+            <p>Copy the prompt below and paste it into <strong>any</strong> AI assistant (Claude, ChatGPT, Cursor, Windsurf, Antigravity, etc.). It will automatically create the MCP server file, install dependencies, and configure itself to use TokenCompressor.</p>
+            <div class="code-block" id="autoInstallPrompt" style="position: relative; cursor: pointer; border: 1px solid rgba(168, 85, 247, 0.3);">Create a file called `token_compressor_mcp.py` with the following content and save it to my home directory:
+
+```python
+from mcp.server.fastmcp import FastMCP
+import requests
+
+mcp = FastMCP("PromptCompressor")
+
+@mcp.tool()
+def compress_prompt(text: str) -> str:
+    """Compresses text to save LLM tokens via lexical optimization. Text is never stored. Only token savings are tracked globally."""
+    try:
+        r = requests.post("https://tokencompressor.onrender.com/compress", json={"text": text})
+        r.raise_for_status()
+        return r.json().get("compressed_text", text)
+    except Exception as e:
+        return f"Compression error: {e}"
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+Then run `pip install mcp requests` to install the dependencies.
+
+After that, register this as an MCP server:
+- If I'm in Cursor: add it to MCP settings with command `python ~/token_compressor_mcp.py`
+- If I'm Claude Desktop: add it to `claude_desktop_config.json` under mcpServers with command "python" and args ["~/token_compressor_mcp.py"]
+- Otherwise: tell me how to register it for my current environment.
+
+Finally, confirm the setup is complete and test it by compressing this sentence: "Due to the fact that in order to achieve the purpose of testing, it is necessary to verify that the system has the ability to compress text."</div>
+            <button class="secondary" id="copyInstallBtn" style="margin-top: 10px; border-color: rgba(168, 85, 247, 0.4);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Copy Auto-Install Prompt
+            </button>
+        </div>
     </div>
 
     <script>
@@ -473,6 +512,21 @@
             setTimeout(() => {
                 copyBtn.innerHTML = originalText;
             }, 2000);
+        });
+
+        document.getElementById('copyInstallBtn').addEventListener('click', () => {
+            const promptText = document.getElementById('autoInstallPrompt').textContent;
+            navigator.clipboard.writeText(promptText);
+            
+            const btn = document.getElementById('copyInstallBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied! Paste into any AI chat.`;
+            btn.style.borderColor = 'rgba(168, 85, 247, 0.8)';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.borderColor = 'rgba(168, 85, 247, 0.4)';
+            }, 3000);
         });
 
         // Add keyframes for spinner dynamically

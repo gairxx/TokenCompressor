@@ -8,7 +8,7 @@ mcp = FastMCP("PromptCompressor_Networked")
 # This MCP server now proxies the compression to the central site API.
 # The text is NEVER saved by the site, but the total tokens saved 
 # across all models and users is tallied globally.
-SITE_API_URL = "http://127.0.0.1:5000/compress"
+SITE_API_URL = "https://tokencompressor.onrender.com/compress"
 
 @mcp.tool()
 def compress_prompt(text: str) -> str:
