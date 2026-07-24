@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokenCompressor - LLM Prompt Optimizer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #10b981;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+                              radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.15), transparent 25%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #60a5fa, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease-out 0.2s both;
+        }
+
+        .metric-card {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem 4rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);
+            backdrop-filter: blur(8px);
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: scale(1.05);
+        }
+
+        .metric-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #10b981;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            transition: all 0.5s ease;
+        }
+
+        .metric-label {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--accent);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        textarea {
+            width: 100%;
+            flex-grow: 1;
+            min-height: 300px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 1rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .controls {
+            grid-column: span 2;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+        }
+
+        button.secondary {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            box-shadow: none;
+        }
+
+        button.secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .instructions {
+            grid-column: span 2;
+            margin-top: 2rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .mcp-instructions {
+            grid-column: span 2;
+            margin-top: 1rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .instructions h3, .mcp-instructions h3 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        
+        .mcp-instructions h3 {
+            color: #60a5fa;
+        }
+        
+        .instructions p, .instructions ul, .mcp-instructions p, .mcp-instructions li {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .instructions ul, .mcp-instructions ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .code-block {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-family: monospace;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .controls {
+                grid-column: span 1;
+            }
+            .instructions {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>TokenCompressor</h1>
+        <p class="subtitle">Optimize text for LLMs. Save tokens. Keep capabilities.</p>
+    </header>
+
+    <div class="dashboard">
+        <div class="metric-card">
+            <div class="metric-value" id="bigTokenCounter">0</div>
+            <div class="metric-label">Tokens Saved This Run</div>
+        </div>
+        <div class="metric-card" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);">
+            <div class="metric-value" id="globalTokenCounter" style="color: #60a5fa; text-shadow: 0 0 20px rgba(96, 165, 250, 0.4);">0</div>
+            <div class="metric-label">Global Tokens Saved</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Input Text</h2>
+                <span class="stats" id="inputStats">Words: 0 | Est. Tokens: 0</span>
+            </div>
+            <textarea id="inputText" placeholder="Paste your large prompt, document, or code here..."></textarea>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Compressed Output</h2>
+                <span class="stats" id="outputStats" style="color: #60a5fa; border-color: rgba(96, 165, 250, 0.2);">Words: 0 | Savings: 0%</span>
+            </div>
+            <textarea id="outputText" readonly placeholder="Compressed text will appear here..."></textarea>
+        </div>
+
+        <div class="controls">
+            <button id="compressBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m8 17 4 4 4-4"></path></svg>
+                Compress Lexically
+            </button>
+            <button class="secondary" id="copyBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Copy to Clipboard
+            </button>
+        </div>
+
+        <div class="instructions">
+            <h3>How to use this with LLMs?</h3>
+            <p><strong>Lexical Compression:</strong> This algorithm removes filler words (stopwords) and replaces verbose phrases with minimal equivalents without breaking tokenizer (BPE) boundaries. It instantly saves ~20-30% tokens.</p>
+            <br>
+            <p><strong>For Maximum Compression (Semantic SPR):</strong> If you want to compress a massive text (like a whole book) into a tiny space for long-term memory, ask an LLM directly using this prompt:</p>
+            <div class="code-block">"Analyze the following text and compress it into a Sparse Priming Representation (SPR). Use dense jargon, abbreviations, and minimalist syntax. Ensure that an LLM can flawlessly reconstruct the core knowledge, logic, and factual data from this SPR. Give me ONLY the SPR."</div>
+        </div>
+
+        <div class="mcp-instructions">
+            <h3>🤖 Connect Your Agents via MCP</h3>
+            <p>We provide a <strong>Model Context Protocol (MCP)</strong> server so your AI agents can automatically compress text themselves. Because it's an API, the text is never saved by us, but it contributes to the global token savings tally above!</p>
+            
+            <h4 style="color: #f8fafc; margin-top: 15px;">For Claude Desktop</h4>
+            <p>Add this to your <code>claude_desktop_config.json</code>:</p>
+            <div class="code-block">{
+  "mcpServers": {
+    "prompt-compressor": {
+      "command": "python",
+      "args": ["/path/to/TokenCompressor/mcp-server/server.py"]
+    }
+  }
+}</div>
+            
+            <h4 style="color: #f8fafc; margin-top: 15px;">For Cursor IDE</h4>
+            <ol style="color: var(--text-muted); margin-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 10px;">
+                <li>Open Settings > Features > MCP</li>
+                <li>Add a new MCP server. Type: <strong>stdio</strong></li>
+                <li>Command: <code>python /path/to/TokenCompressor/mcp-server/server.py</code></li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const inputStats = document.getElementById('inputStats');
+        const outputStats = document.getElementById('outputStats');
+        const compressBtn = document.getElementById('compressBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const globalTokenCounter = document.getElementById('globalTokenCounter');
+        const bigTokenCounter = document.getElementById('bigTokenCounter');
+
+        // Estimate tokens for local UI updates
+        function estimateTokens(text) {
+            if (!text.trim()) return 0;
+            const words = text.match(/\b\w+\b/g) || [];
+            const punct = text.match(/[^\w\s]+/g) || [];
+            return words.length + Math.ceil(punct.length * 0.5);
+        }
+
+        function countWords(text) {
+            if (!text.trim()) return 0;
+            return (text.match(/\b\w+\b/g) || []).length;
+        }
+
+        function updateInputStats() {
+            const text = inputText.value;
+            const words = countWords(text);
+            const tokens = estimateTokens(text);
+            inputStats.textContent = `Words: ${words} | Est. Tokens: ${tokens}`;
+        }
+
+        inputText.addEventListener('input', updateInputStats);
+
+        // Fetch initial global stats
+        async function loadGlobalStats() {
+            try {
+                const res = await fetch('/stats');
+                const data = await res.json();
+                globalTokenCounter.textContent = data.global_tokens_saved.toLocaleString();
+            } catch (e) {
+                console.error("Could not load global stats", e);
+            }
+        }
+        
+        loadGlobalStats();
+
+        compressBtn.addEventListener('click', async () => {
+            const original = inputText.value;
+            if (!original.trim()) return;
+
+            // Animate button
+            const originalText = compressBtn.innerHTML;
+            compressBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg> Compressing...`;
+            
+            try {
+                const response = await fetch('/compress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: original })
+                });
+                
+                if (!response.ok) throw new Error("API Error");
+                const data = await response.json();
+                
+                outputText.value = data.compressed_text;
+                
+                const origTokens = estimateTokens(original);
+                const savedTokens = data.tokens_saved;
+                const savingsPct = origTokens > 0 ? Math.round((savedTokens / origTokens) * 100) : 0;
+                
+                outputStats.textContent = `Words: ${countWords(data.compressed_text)} | Savings: ${savingsPct}%`;
+                
+                // Animate counters
+                bigTokenCounter.textContent = savedTokens.toLocaleString();
+                bigTokenCounter.style.transform = 'scale(1.2)';
+                bigTokenCounter.style.color = '#34d399';
+                
+                globalTokenCounter.textContent = data.global_tokens_saved.toLocaleString();
+                globalTokenCounter.style.transform = 'scale(1.1)';
+                
+                setTimeout(() => {
+                    bigTokenCounter.style.transform = 'scale(1)';
+                    bigTokenCounter.style.color = '#10b981';
+                    globalTokenCounter.style.transform = 'scale(1)';
+                }, 300);
+                
+                // Flash effect on output
+                outputText.style.borderColor = 'var(--accent)';
+                outputText.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.4)';
+                setTimeout(() => {
+                    outputText.style.borderColor = 'var(--glass-border)';
+                    outputText.style.boxShadow = 'none';
+                }, 1000);
+                
+            } catch (err) {
+                alert("Error compressing text. Is the backend running?");
+                console.error(err);
+            } finally {
+                compressBtn.innerHTML = originalText;
+            }
+        });
+
+        copyBtn.addEventListener('click', () => {
+            if (!outputText.value) return;
+            navigator.clipboard.writeText(outputText.value);
+            
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Copied!`;
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        });
+
+        // Add keyframes for spinner dynamically
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes spin {
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+
+    </script>
+</body>
+</html>
